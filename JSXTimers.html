@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>JSX Demo Timer</title>
+  <title>Kitchen Timers</title>
   <meta charset="utf-8" />
 </head>
 <body>
@@ -12,47 +12,63 @@
   <script src="react/babel.js"></script>
   <script type="text/babel">
 
-    function Counter({ start }) {
-        const [counter, setCounter] = React.useState(start);
+    function KitchenTimer() {
+      const [title, setTitle] = React.useState("My Timer");
+      const [start, setStart] = React.useState(60);
+      const [interval, setInterval] = React.useState(1000);
+      const [count, setCount] = React.useState(60);
+      const [running, setRunning] = React.useState(false);
 
-	React.useEffect(() => {
-            const tickTock = () => {
-		setCounter((value) => value + 1);
-            }
-	    
-            const timer = setInterval(tickTock, 1000);
+      React.useEffect(() => {
+        if (!running) return;
 
-	    return () => {
-		clearInterval(timer);
-	    };
+        const timer = window.setInterval(() => {
+          setCount((value) => value - 1);
+        }, interval);
 
-	}, []);  // [] tells it to only run once
-	    
-        return (
-	   <main>
-	      <p>Counter: {counter}</p>
-		<button onClick={() => setCounter(0)}>
-	          Reset
-              </button>
-	   </main>
-	);
+        return () => window.clearInterval(timer);
+      }, [running, interval]);
+
+      return (
+        <main>
+          <p>
+            <label>Title: <input value={title} onChange={(e) => setTitle(e.target.value)} /></label>
+          </p>
+          <p>
+            <label>Start: <input type="number" value={start} onChange={(e) => setStart(Number(e.target.value))} /></label>
+          </p>
+          <p>
+            <label>Speed: 
+              <select value={interval} onChange={(e) => setInterval(Number(e.target.value))}>
+                <option value={100}>Tenths</option>
+                <option value={1000}>Seconds</option>
+                <option value={60000}>Minutes</option>
+              </select>
+            </label>
+          </p>
+          <h2>{title}</h2>
+          <p>Time: {count}</p>
+          <button onClick={() => setRunning(true)}>Start</button>
+          <button onClick={() => setRunning(false)}>Stop</button>
+          <button onClick={() => { setCount(start); setRunning(false); }}>Reset</button>
+        </main>
+      );
     }
 
     function App() {
       return (
         <div>
-          <Counter start={0} />
-          <Counter start={123} />
-          <Counter start={-64} />
+          <h1>Kitchen Timer</h1>
+          <KitchenTimer />
         </div>
       );
     }
 
     ReactDOM.render(
-	    <React.StrictMode>
-            <App />
-	    </React.StrictMode>,
-	document.getElementById("root")
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>,
+      document.getElementById("root")
     );
 
   </script>

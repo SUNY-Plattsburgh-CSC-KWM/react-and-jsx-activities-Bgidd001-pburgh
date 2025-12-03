@@ -1,8 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>JSX Demo Counter</title>
+  <title>Basic Calculator</title>
   <meta charset="utf-8" />
+  <style>
+    .calculator {
+      max-width: 250px;
+      margin: 20px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .display {
+      background: #222;
+      color: white;
+      padding: 15px;
+      font-size: 24px;
+      text-align: right;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 5px;
+    }
+    button {
+      padding: 15px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div id="root"></div>
@@ -12,35 +40,71 @@
   <script src="react/babel.js"></script>
   <script type="text/babel">
 
-    function Counter({ start }) {
-      const [counter, setCounter] = React.useState(start);
-      return (
-        <main>
-          <p>Counter: {counter}</p>
-          <button onClick={() => setCounter((value) => value + 1)}>
-            Increment
-          </button>
-        </main>
-      );
-    }
+    function Calculator() {
+      const [display, setDisplay] = React.useState(0);
+      const [previous, setPrevious] = React.useState(null);
+      const [operation, setOperation] = React.useState(null);
 
-    function App() {
+      function inputNumber(num) {
+        setDisplay(prev => prev === 0 ? num : prev * 10 + num);
+      }
+
+      function doOperation(op) {
+        setPrevious(display);
+        setOperation(op);
+        setDisplay(0);
+      }
+
+      function calculate() {
+        if (previous === null || operation === null) return;
+        let result;
+        switch (operation) {
+          case '+': result = previous + display; break;
+          case '-': result = previous - display; break;
+          case '*': result = previous * display; break;
+          case '/': result = display !== 0 ? previous / display : 0; break;
+        }
+        setDisplay(result);
+        setPrevious(null);
+        setOperation(null);
+      }
+
+      function clear() {
+        setDisplay(0);
+        setPrevious(null);
+        setOperation(null);
+      }
+
       return (
-        <div>
-          <Counter start={0} />
-          <Counter start={123} />
-          <Counter start={-64} />
+        <div className="calculator">
+          <div className="display">{display}</div>
+          <div className="buttons">
+            <button onClick={() => inputNumber(7)}>7</button>
+            <button onClick={() => inputNumber(8)}>8</button>
+            <button onClick={() => inputNumber(9)}>9</button>
+            <button onClick={() => doOperation('/')}>÷</button>
+            <button onClick={() => inputNumber(4)}>4</button>
+            <button onClick={() => inputNumber(5)}>5</button>
+            <button onClick={() => inputNumber(6)}>6</button>
+            <button onClick={() => doOperation('*')}>×</button>
+            <button onClick={() => inputNumber(1)}>1</button>
+            <button onClick={() => inputNumber(2)}>2</button>
+            <button onClick={() => inputNumber(3)}>3</button>
+            <button onClick={() => doOperation('-')}>−</button>
+            <button onClick={clear}>C</button>
+            <button onClick={() => inputNumber(0)}>0</button>
+            <button onClick={calculate}>=</button>
+            <button onClick={() => doOperation('+')}>+</button>
+          </div>
         </div>
       );
     }
 
-    const root = ReactDOM.render(<App />, document.getElementById("root"));
+    function App() {
+      return <Calculator />;
+    }
 
-    root.render(
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    );
+    ReactDOM.render(<App />, document.getElementById("root"));
 
   </script>
 </body>
